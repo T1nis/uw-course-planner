@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Search, Plus, Check, Clock, Star, TrendingUp, BookOpen, Users, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
-
+import Navigation from './NavBar';
 // Mock data for completed and planned courses
 const completedCourses = {
   "Fall 2024": [
@@ -76,6 +76,7 @@ const courseDatabase = [
 ];
 
 export default function RoadmapPage() {
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showCourseSearch, setShowCourseSearch] = useState(false);
@@ -269,6 +270,11 @@ export default function RoadmapPage() {
 };
 
   return (
+
+     <div>
+      <Navigation /> 
+            <div className="pt-16">
+
     <div className="min-h-screen bg-gradient-to-br from-[#171923] via-[#22223c] to-[#29304d] p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -463,6 +469,8 @@ export default function RoadmapPage() {
       onAdd={handleAddCourse}
     />
       </div>
+    </div>
+    </div>
     </div>
   );
 }
