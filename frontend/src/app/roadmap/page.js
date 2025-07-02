@@ -475,7 +475,7 @@ const priorityCourses = getPriorityCourses(
   </div>
 
   {priorityCourses.length === 0 ? (
-    <p className="text-gray-300">You're all caught up on required courses!</p>
+    <p className="text-gray-300">You are all caught up on required courses!</p>
   ) : (
     <div className="space-y-4">
       {priorityCourses.map(course => (
