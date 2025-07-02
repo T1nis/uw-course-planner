@@ -4,7 +4,7 @@
 // Import React and useState hook for managing component state
 import React, { useState } from 'react';
 // Import various icon components from Lucide React icon library
-import { Search, Plus, Check, Clock, Star, TrendingUp, BookOpen, Users, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Plus, Check, Clock, Star, TrendingUp, BookOpen, Users, Calendar, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 // Import custom Navigation component from separate file
 import Navigation from './NavBar';
 
@@ -94,7 +94,8 @@ export default function RoadmapPage() {
   const [showCourseSearch, setShowCourseSearch] = useState(false); // Controls visibility of course search panel
   const [showSemesterModal, setShowSemesterModal] = useState(false); // Controls visibility of semester selection modal
   const [courseToAdd, setCourseToAdd] = useState(null); // Stores course that user wants to add to roadmap
-
+  const [semesterIndex, setSemesterIndex] = useState(0);
+  
   // State for planned courses - organized by semester
   // This is where future courses are stored before they're taken
   const [plannedCourses, setPlannedCourses] = useState({
@@ -133,13 +134,61 @@ export default function RoadmapPage() {
   
   // Calculate projected percentage including planned courses
   const plannedProgressPercentage = Math.round(((totalCreditsCompleted + totalCreditsPlanned) / totalCreditsNeeded) * 100);
+const majorRequirements = [
+  'CS 300',
+  'CS 301',
+  'CS 302',
+  'CS 400',
+  'CS 540',
+  'MATH 234',
+  'STAT 324'
+];
 
-  // Filter courses based on search term
-  // Searches both course code and course name (case insensitive)
-  const filteredCourses = courseDatabase.filter(course =>
-    course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+const filteredCourses = courseDatabase.filter(course =>
+  course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  course.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+// ✅ FIRST: define the function
+const getPriorityCourses = (completed, planned, requirements, database) => {
+  const completedCodes = completed.flat().map(c => c.code);
+  const plannedCodes = planned.flat().map(c => c.code);
+  const taken = new Set([...completedCodes, ...plannedCodes]);
+
+  const remaining = requirements.filter(code => !taken.has(code));
+
+  const priorityCourses = remaining.map(code => {
+    const dependents = database.filter(c => 
+      requirements.includes(c.code) && 
+      c.prerequisites?.includes(code)
+    ).length;
+
+    const courseObj = database.find(c => c.code === code);
+    if (!courseObj) console.warn("Missing course in courseDatabase:", code);
+
+    return {
+      code,
+      dependentCount: dependents,
+      course: courseObj
+    };
+  });
+
+  return priorityCourses
+    .sort((a, b) => b.dependentCount - a.dependentCount)
+    .filter(p => p.course)
+    .map(p => p.course)
+    .slice(0, 3);
+};
+
+// ✅ THEN: use it
+const priorityCourses = getPriorityCourses(
+  Object.values(completedCourses).flat(),
+  Object.values(plannedCourses).flat(),
+  majorRequirements,
+  courseDatabase
+);
+
 
   // CourseCard component - displays individual course information
   // Takes course object and status ('completed', 'planned', or 'available')
@@ -164,9 +213,9 @@ export default function RoadmapPage() {
           {status === 'completed' && <Check className="w-4 h-4 text-green-400" />}
           {status === 'planned' && <Clock className="w-4 h-4 text-blue-400" />}
           {/* Credits badge */}
-          <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
-            {course.credits} cr
-          </span>
+         <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full whitespace-nowrap">
+  {course.credits} cr
+</span>
         </div>
       </div>
       <div className="flex items-center justify-between">
@@ -418,28 +467,26 @@ export default function RoadmapPage() {
               </div>
             </div>
           </div>
+{/* Suggested Priority Courses Panel */}
+<div className="bg-yellow-500/10 border border-yellow-400/20 rounded-2xl p-6 backdrop-blur-lg">
+  <div className="flex items-center gap-3 mb-4">
+    <TrendingUp className="w-6 h-6 text-yellow-300" />
+    <h3 className="text-lg font-semibold text-white">Suggested for Next Semester</h3>
+  </div>
 
-          {/* Credits Summary Card */}
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-6 backdrop-blur-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <Users className="w-6 h-6 text-green-400" />
-              <h3 className="text-lg font-semibold text-white">Credits</h3>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Completed</span>
-                <span className="text-green-400 font-bold">{totalCreditsCompleted}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Planned</span>
-                <span className="text-blue-400 font-bold">{totalCreditsPlanned}</span>
-              </div>
-              <div className="flex justify-between border-t border-white/20 pt-2">
-                <span className="text-white font-medium">Remaining</span>
-                <span className="text-purple-400 font-bold">{totalCreditsNeeded - totalCreditsCompleted - totalCreditsPlanned}</span>
-              </div>
-            </div>
-          </div>
+  {priorityCourses.length === 0 ? (
+    <p className="text-gray-300">You're all caught up on required courses!</p>
+  ) : (
+    <div className="space-y-4">
+      {priorityCourses.map(course => (
+        <div key={course.code} className="p-4 bg-white/5 border border-white/10 rounded-xl">
+          <h4 className="text-white font-medium">{course.code} - {course.name}</h4>
+          <p className="text-sm text-gray-300">{course.description}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
           {/* Graduation Timeline Card */}
           <div className="bg-white/10 border border-white/20 rounded-2xl p-6 backdrop-blur-lg">
@@ -508,17 +555,19 @@ export default function RoadmapPage() {
           
         {/* Completed Courses Section */}
 <div className="bg-green-500/5 border border-green-400/20 rounded-2xl p-6">
-  <h3 className="text-xl font-semibold text-green-400 mb-4 flex items-center gap-2">
-    <Check className="w-5 h-5" />
+  <h3 className="text-xl font-semibold text-green-400 mb-6 flex items-center gap-2">
+    <Check className="w-6 h-6" />
     Completed Courses
   </h3>
   {/* Horizontal scrollable container for semesters */}
-  <div className="flex gap-6 overflow-x-auto">
+  <div className="flex gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 scrollbar-hide px-4">
     {/* Map through each semester of completed courses */}
     {Object.entries(completedCourses).map(([semester, courses]) => (
-      <div key={semester} className="flex-shrink-0 min-w-[300px]">
-        <h4 className="text-lg font-medium text-white mb-3 text-center">{semester}</h4>
-        <div className="space-y-3">
+      <div key={semester}
+        className="flex-shrink-0 w-[360px] snap-start bg-white/10 border border-white/20 rounded-xl p-6"  /* bigger width and padding */
+      >
+        <h4 className="text-xl font-medium text-white mb-4 text-center">{semester}</h4>
+        <div className="space-y-4 pr-2">
           {/* Render each course in the semester */}
           {courses.map(course => (
             <CourseCard key={course.code} course={course} status="completed" />
@@ -529,28 +578,31 @@ export default function RoadmapPage() {
   </div>
 </div>
 
-  {/* Planned Courses Section */}
-<div className="bg-blue-500/5 border border-blue-400/20 rounded-2xl p-6">
-  <h3 className="text-xl font-semibold text-blue-400 mb-4 flex items-center gap-2">
-    <Clock className="w-5 h-5" />
+{/* Planned Courses Section */}
+<div className="bg-blue-500/5 border border-blue-400/20 rounded-2xl p-8">  {/* increased padding */}
+  <h3 className="text-xl font-semibold text-blue-400 mb-6 flex items-center gap-2">
+    <Clock className="w-6 h-6" />  {/* slightly bigger icon */}
     Planned Courses
   </h3>
-  {/* Horizontal scrollable container for planned semesters */}
-  <div className="flex gap-6 overflow-x-auto">
-    {/* Map through each semester of planned courses */}
+
+  <div className="flex gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 scrollbar-hide px-4">
     {Object.entries(plannedCourses).map(([semester, courses]) => (
-      <div key={semester} className="flex-shrink-0 min-w-[300px]">
-        <h4 className="text-lg font-medium text-white mb-3 text-center">{semester}</h4>
-        <div className="space-y-3">
-          {/* Render each course in the semester */}
-          {courses.map(course => (
-            <CourseCard key={course.code} course={course} status="planned" />
-          ))}
-        </div>
+      <div
+        key={semester}
+        className="flex-shrink-0 w-[360px] snap-start bg-white/10 border border-white/20 rounded-xl p-6"  /* bigger width and padding */
+      >
+        <h4 className="text-xl font-medium text-white mb-4 text-center">{semester}</h4>  {/* bigger text */}
+        <div className="space-y-4 pr-2">
+        {courses.map((course) => (
+        <CourseCard key={course.code} course={course} status="planned" />
+  ))}
+</div>
+
       </div>
     ))}
   </div>
 </div>
+
 
           {/* Recommended CS Electives Section */}
           <div className="bg-purple-500/5 border border-purple-400/20 rounded-2xl p-6">
