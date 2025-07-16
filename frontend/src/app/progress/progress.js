@@ -53,8 +53,7 @@ const ProgressPage = () => {
       totalCredits: 36,
       completedCredits: 20,
       courses: [
-        { name: "World History", : 3, completed: true, grade: "B+" },
-        { name: "Psychology 101", crecreditsdits: 3, completed: true, grade: "A-" },
+        { name: "Psychology 101", credits: 3, completed: true, grade: "A-" },
         { name: "Literature", credits: 3, completed: true, grade: "B" },
         { name: "Philosophy", credits: 3, completed: true, grade: "A" },
         { name: "Art History", credits: 3, completed: true, grade: "B+" },
