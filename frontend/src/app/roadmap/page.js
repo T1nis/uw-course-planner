@@ -3,6 +3,8 @@
 
 // Import React and useState hook for managing component state
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
+
 // Import various icon components from Lucide React icon library
 import { Search, Plus, Check, Clock, Star, TrendingUp, BookOpen, Users, Calendar, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 // Import custom Navigation component from separate file
@@ -318,12 +320,13 @@ const priorityCourses = getPriorityCourses(
               <h3 className="text-2xl font-bold text-white">{course.code}</h3>
               <p className="text-lg text-gray-300">{course.name}</p>
             </div>
-            <button 
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition text-2xl"
-            >
-              ×
-            </button>
+          <button 
+  onClick={onClose}
+  className="text-gray-400 hover:text-white transition text-[40px] leading-none font-light px-2"
+>
+  ×
+</button>
+
           </div>
           
           <div className="space-y-4">
@@ -375,7 +378,7 @@ const priorityCourses = getPriorityCourses(
       handleRemoveCourse(course);
       onClose();
     }}
-    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition"
+    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition"
   >
     Remove from Roadmap
   </button>
