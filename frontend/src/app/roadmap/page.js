@@ -97,7 +97,7 @@ export default function RoadmapPage() {
   const [showSemesterModal, setShowSemesterModal] = useState(false); // Controls visibility of semester selection modal
   const [courseToAdd, setCourseToAdd] = useState(null); // Stores course that user wants to add to roadmap
   const [semesterIndex, setSemesterIndex] = useState(0);
-
+  
   // State for planned courses - organized by semester
   // This is where future courses are stored before they're taken
   const [plannedCourses, setPlannedCourses] = useState({
@@ -136,7 +136,15 @@ export default function RoadmapPage() {
   
   // Calculate projected percentage including planned courses
   const plannedProgressPercentage = Math.round(((totalCreditsCompleted + totalCreditsPlanned) / totalCreditsNeeded) * 100);
-
+const majorRequirements = [
+  'CS 300',
+  'CS 301',
+  'CS 302',
+  'CS 400',
+  'CS 540',
+  'MATH 234',
+  'STAT 324'
+];
 
 
 const filteredCourses = courseDatabase.filter(course =>
