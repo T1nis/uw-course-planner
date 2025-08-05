@@ -2,7 +2,7 @@
 "use client";
 
 // Import React and useState hook for managing component state
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 // Import various icon components from Lucide React icon library
@@ -34,61 +34,52 @@ const completedCourses = {
 // - MadGrades data (GPA and difficulty ratings)
 // - Rate My Professor data (rating and top professor)
 // - Prerequisites list
-const courseDatabase = [
-  { 
-    code: 'CS 540', 
-    name: 'Introduction to Artificial Intelligence', 
-    credits: 3, 
-    requirement: 'CS Elective',
-    description: 'Principles of knowledge-based search techniques, automatic deduction, knowledge representation using predicate logic, machine learning, probabilistic reasoning.',
-    madGrades: { avgGPA: 3.2, difficulty: 7.2 },
-    rmp: { rating: 4.2, professor: 'Dr. Sarah Chen' },
-    prerequisites: ['CS 400', 'CS 577']
-  },
-  { 
-    code: 'CS 559', 
-    name: 'Computer Graphics', 
-    credits: 3, 
-    requirement: 'CS Elective',
-    description: 'Image synthesis and manipulation. Linear transformations, clipping, hidden surface removal, shading and texture mapping.',
-    madGrades: { avgGPA: 3.5, difficulty: 6.8 },
-    rmp: { rating: 4.5, professor: 'Dr. Michael Torres' },
-    prerequisites: ['CS 400', 'MATH 340']
-  },
-  { 
-    code: 'CS 564', 
-    name: 'Database Management Systems', 
-    credits: 3, 
-    requirement: 'CS Elective',
-    description: 'Design and implementation of database management systems including data models, query languages, query optimization, and database design.',
-    madGrades: { avgGPA: 3.1, difficulty: 7.5 },
-    rmp: { rating: 3.9, professor: 'Dr. Jennifer Liu' },
-    prerequisites: ['CS 400']
-  },
-  { 
-    code: 'CS 571', 
-    name: 'Building User Interfaces', 
-    credits: 3, 
-    requirement: 'CS Elective',
-    description: 'Hands-on introduction to building user interfaces. Experience with tools and technologies for building user interfaces.',
-    madGrades: { avgGPA: 3.6, difficulty: 6.2 },
-    rmp: { rating: 4.7, professor: 'Dr. Alex Rodriguez' },
-    prerequisites: ['CS 400']
-  },
-  { 
-    code: 'CS 506', 
-    name: 'Software Engineering', 
-    credits: 3, 
-    requirement: 'CS Elective',
-    description: 'Introduces students to the software development life cycle and engineering approaches to building complex software systems.',
-    madGrades: { avgGPA: 3.4, difficulty: 6.5 },
-    rmp: { rating: 4.1, professor: 'Dr. Kevin Park' },
-    prerequisites: ['CS 400']
-  }
-];
+ // Replace hardcoded courseDatabase with fetched data
+
+
+
 
 // Main component definition
 export default function RoadmapPage() {
+
+    const [courseDatabase, setCourseDatabase] = useState([]);
+useEffect(() => {
+  fetch('http://127.0.0.1:5000/api/courses')
+    .then(res => res.json())
+    .then(data => {
+      // Map backend data to expected frontend format
+      const mappedCourses = data.map(raw => ({
+        code: raw.course_reference
+          ? `${raw.course_reference.subjects[0]} ${raw.course_reference.course_number}`
+          : '',
+
+        name: raw.course_title || '',
+
+        description: raw.description || '',
+
+        credits: raw.cumulative_grade_data?.credit || 3, // fallback to 3 if not present
+
+        requirement: '', // You can add logic to set this if you want
+
+        prerequisites: raw.prerequisites?.course_references
+          ? raw.prerequisites.course_references.map(pr => 
+              pr.subjects ? `${pr.subjects[0]} ${pr.course_number}` : ''
+            )
+          : [],
+
+        madGrades: {
+          avgGPA: null, // Fill with your logic if you want
+          difficulty: null // Fill with your logic if you want
+        },
+
+        rmp: {
+          rating: null,
+          professor: null
+        }
+      }));
+      setCourseDatabase(mappedCourses);
+    });
+}, []);
 
   // State variables using useState hook
   const [searchTerm, setSearchTerm] = useState(''); // Stores the search input text
