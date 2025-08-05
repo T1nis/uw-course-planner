@@ -97,7 +97,26 @@ export default function RoadmapPage() {
   const [showSemesterModal, setShowSemesterModal] = useState(false); // Controls visibility of semester selection modal
   const [courseToAdd, setCourseToAdd] = useState(null); // Stores course that user wants to add to roadmap
   const [semesterIndex, setSemesterIndex] = useState(0);
-  
+
+  // State for planned courses - organized by semester
+  // This is where future courses are stored before they're taken
+  const [plannedCourses, setPlannedCourses] = useState({
+    "Fall 2025": [
+      { code: 'CS 354', name: 'Machine Organization and Programming', credits: 3, requirement: 'Major Core' },
+      { code: 'CS 577', name: 'Introduction to Algorithms', credits: 3, requirement: 'Major Core' },
+      { code: 'STAT 324', name: 'Introductory Applied Statistics', credits: 3, requirement: 'Major Requirement' }
+    ],
+    "Spring 2026": [], // Empty array means no courses planned for this semester
+    "Fall 2026": [], 
+    "Fall 2027": [
+      { code: 'CS 600', name: 'Capstone Project', credits: 3, requirement: 'Major Core' }
+    ],
+    "Spring 2027": [
+      { code: 'CS 610', name: 'Advanced Topics in Computer Science', credits: 3, requirement: 'Major Elective' },
+      { code: 'CS 620', name: 'Distributed Systems', credits: 3, requirement: 'Major Elective' }
+    ],
+    "Spring 2028": [],
+  });
 
   // Calculate progress statistics
   // Flatten all completed courses and sum their credits
