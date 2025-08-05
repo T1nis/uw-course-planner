@@ -12,6 +12,20 @@ import Navigation from './NavBar';
 
 // Mock data for completed courses - organized by semester
 // Each course object contains: code, name, credits, grade, semester, requirement type
+const completedCourses = {
+  "Fall 2024": [
+    { code: 'CS 300', name: 'Programming II', credits: 3, grade: 'A', semester: 'Fall 2024', requirement: 'Major Core' },
+    { code: 'MATH 221', name: 'Calculus & Analytic Geometry I', credits: 5, grade: 'B+', semester: 'Fall 2024', requirement: 'Major Requirement' },
+    { code: 'ENG 101', name: 'English Composition', credits: 3, grade: 'A-', semester: 'Fall 2024', requirement: 'General Education' },
+    { code: 'LIS 202', name: 'Library Information Science', credits: 3, grade: 'A', semester: 'Fall 2024', requirement: 'General Education' }
+  ], 
+  "Spring 2025" : [
+   { code: 'CS 400', name: 'Programming III', credits: 3, grade: 'A-', semester: 'Spring 2025', requirement: 'Major Core' },
+  { code: 'MATH 222', name: 'Calculus & Analytic Geometry II', credits: 4, grade: 'B', semester: 'Spring 2025', requirement: 'Major Requirement' },
+  { code: 'Astro 101', name: 'Introduction to Astronomy', credits: 3, grade: 'A', semester: 'Spring 2025', requirement: 'General Education' },
+  {code: 'Stats 240', name: 'Introduction to Statistics', credits: 3, grade: 'B+', semester: 'Spring 2025', requirement: 'General Education' }
+]
+};
 
 // Mock course database for search functionality
 // Contains available courses with detailed information including:
@@ -20,6 +34,58 @@ import Navigation from './NavBar';
 // - MadGrades data (GPA and difficulty ratings)
 // - Rate My Professor data (rating and top professor)
 // - Prerequisites list
+const courseDatabase = [
+  { 
+    code: 'CS 540', 
+    name: 'Introduction to Artificial Intelligence', 
+    credits: 3, 
+    requirement: 'CS Elective',
+    description: 'Principles of knowledge-based search techniques, automatic deduction, knowledge representation using predicate logic, machine learning, probabilistic reasoning.',
+    madGrades: { avgGPA: 3.2, difficulty: 7.2 },
+    rmp: { rating: 4.2, professor: 'Dr. Sarah Chen' },
+    prerequisites: ['CS 400', 'CS 577']
+  },
+  { 
+    code: 'CS 559', 
+    name: 'Computer Graphics', 
+    credits: 3, 
+    requirement: 'CS Elective',
+    description: 'Image synthesis and manipulation. Linear transformations, clipping, hidden surface removal, shading and texture mapping.',
+    madGrades: { avgGPA: 3.5, difficulty: 6.8 },
+    rmp: { rating: 4.5, professor: 'Dr. Michael Torres' },
+    prerequisites: ['CS 400', 'MATH 340']
+  },
+  { 
+    code: 'CS 564', 
+    name: 'Database Management Systems', 
+    credits: 3, 
+    requirement: 'CS Elective',
+    description: 'Design and implementation of database management systems including data models, query languages, query optimization, and database design.',
+    madGrades: { avgGPA: 3.1, difficulty: 7.5 },
+    rmp: { rating: 3.9, professor: 'Dr. Jennifer Liu' },
+    prerequisites: ['CS 400']
+  },
+  { 
+    code: 'CS 571', 
+    name: 'Building User Interfaces', 
+    credits: 3, 
+    requirement: 'CS Elective',
+    description: 'Hands-on introduction to building user interfaces. Experience with tools and technologies for building user interfaces.',
+    madGrades: { avgGPA: 3.6, difficulty: 6.2 },
+    rmp: { rating: 4.7, professor: 'Dr. Alex Rodriguez' },
+    prerequisites: ['CS 400']
+  },
+  { 
+    code: 'CS 506', 
+    name: 'Software Engineering', 
+    credits: 3, 
+    requirement: 'CS Elective',
+    description: 'Introduces students to the software development life cycle and engineering approaches to building complex software systems.',
+    madGrades: { avgGPA: 3.4, difficulty: 6.5 },
+    rmp: { rating: 4.1, professor: 'Dr. Kevin Park' },
+    prerequisites: ['CS 400']
+  }
+];
 
 // Main component definition
 export default function RoadmapPage() {
