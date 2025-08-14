@@ -12,20 +12,8 @@ import Navigation from './NavBar';
 
 // Mock data for completed courses - organized by semester
 // Each course object contains: code, name, credits, grade, semester, requirement type
-const completedCourses = {
-  "Fall 2024": [
-    { code: 'CS 300', name: 'Programming II', credits: 3, grade: 'A', semester: 'Fall 2024', requirement: 'Major Core' },
-    { code: 'MATH 221', name: 'Calculus & Analytic Geometry I', credits: 5, grade: 'B+', semester: 'Fall 2024', requirement: 'Major Requirement' },
-    { code: 'ENG 101', name: 'English Composition', credits: 3, grade: 'A-', semester: 'Fall 2024', requirement: 'General Education' },
-    { code: 'LIS 202', name: 'Library Information Science', credits: 3, grade: 'A', semester: 'Fall 2024', requirement: 'General Education' }
-  ], 
-  "Spring 2025" : [
-   { code: 'CS 400', name: 'Programming III', credits: 3, grade: 'A-', semester: 'Spring 2025', requirement: 'Major Core' },
-  { code: 'MATH 222', name: 'Calculus & Analytic Geometry II', credits: 4, grade: 'B', semester: 'Spring 2025', requirement: 'Major Requirement' },
-  { code: 'Astro 101', name: 'Introduction to Astronomy', credits: 3, grade: 'A', semester: 'Spring 2025', requirement: 'General Education' },
-  {code: 'Stats 240', name: 'Introduction to Statistics', credits: 3, grade: 'B+', semester: 'Spring 2025', requirement: 'General Education' }
-]
-};
+// With this:
+
 
 // Mock course database for search functionality
 // Contains available courses with detailed information including:
@@ -41,6 +29,11 @@ const completedCourses = {
 
 // Main component definition
 export default function RoadmapPage() {
+
+  const [completedCourses, setCompletedCourses] = useState({
+  "Fall 2024": [],
+  "Spring 2024": []
+});
 
     const [courseDatabase, setCourseDatabase] = useState([]);
 useEffect(() => {
@@ -225,40 +218,56 @@ const priorityCourses = getPriorityCourses(
     </div>
   );
 
-  // SemesterModal component - allows user to select which semester to add a course to
-  const SemesterModal = ({ course, onClose, onAdd }) => {
-  // Don't render if no course is selected
+    
+
+ const SemesterModal = ({ course, plannedCourses, completedCourses, onClose, onAdd }) => {
+  const [addType, setAddType] = useState('planned'); // 'planned' or 'completed'
   if (!course) return null;
-  
-  // Get list of available semesters from plannedCourses object
-  const availableSemesters = Object.keys(plannedCourses);
-  
+
+  // Use the correct semesters based on addType
+  const availableSemesters = addType === 'planned'
+    ? Object.keys(plannedCourses)
+    : Object.keys(completedCourses);
+
   return (
-    // Modal overlay - clicking outside closes the modal
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      {/* Modal content - clicking inside doesn't close modal */}
       <div className="bg-[#1a1b2e] border border-white/20 rounded-2xl p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
         <h3 className="text-xl font-bold text-white mb-4">Add {course.code} to Roadmap</h3>
-        <p className="text-gray-300 mb-6">Which semester would you like to add this course?</p>
-        
-        {/* List of available semesters */}
+        <div className="flex gap-2 mb-6">
+          <button
+            type="button"
+            className={`flex-1 py-2 rounded-xl ${addType === 'planned' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+            onClick={() => setAddType('planned')}
+          >
+            Planned
+          </button>
+          <button
+            type="button"
+            className={`flex-1 py-2 rounded-xl ${addType === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+            onClick={() => setAddType('completed')}
+          >
+            Completed
+          </button>
+        </div>
         <div className="space-y-3 mb-6">
           {availableSemesters.map(semester => (
             <button
               key={semester}
-              onClick={() => onAdd(semester)} // Call onAdd function with selected semester
+              type="button"
+              onClick={() => onAdd(semester, addType)}
               className="w-full text-left p-4 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl transition"
             >
               <div className="text-white font-medium">{semester}</div>
               <div className="text-sm text-gray-400">
-                {plannedCourses[semester].length} courses currently planned
+                {addType === 'planned'
+                  ? plannedCourses[semester].length + ' courses currently planned'
+                  : (completedCourses[semester]?.length || 0) + ' courses completed'}
               </div>
             </button>
           ))}
         </div>
-        
-        {/* Cancel button */}
         <button 
+          type="button"
           onClick={onClose}
           className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-xl transition"
         >
@@ -268,7 +277,6 @@ const priorityCourses = getPriorityCourses(
     </div>
   );
 };
-
  // CourseModal component - displays detailed course information
  const CourseModal = ({ course, onClose }) => {
   // Don't render if no course is selected
@@ -389,23 +397,22 @@ const priorityCourses = getPriorityCourses(
   };
 
   // Function to handle adding course to selected semester
-  const handleAddCourse = (semester) => {
+const handleAddCourse = (semester, addType) => {
   if (!courseToAdd) return;
-  
-  // Update plannedCourses state by adding course to selected semester
-  setPlannedCourses(prev => ({
-    ...prev,
-    [semester]: [...prev[semester], {
-      ...courseToAdd,
-      semester: semester
-    }]
-  }));
-  
-  // Reset modal states
+  if (addType === 'planned') {
+    setPlannedCourses(prev => ({
+      ...prev,
+      [semester]: [...prev[semester], { ...courseToAdd, semester }]
+    }));
+  } else {
+    setCompletedCourses(prev => ({
+      ...prev,
+      [semester]: [...(prev[semester] || []), { ...courseToAdd, semester, grade: 'A' }] // You can prompt for grade if you want
+    }));
+  }
   setShowSemesterModal(false);
   setCourseToAdd(null);
 };
-
   // Main component render
   return (
 
@@ -522,7 +529,7 @@ const priorityCourses = getPriorityCourses(
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search CS electives..."
+                  placeholder="Use Specific Course Names, ie. COMPSCI 300, ENGL 825, ISYE 823"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)} // Update search term state
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
@@ -535,11 +542,14 @@ const priorityCourses = getPriorityCourses(
             </div>
             
             {/* Grid of filtered course cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredCourses.map(course => (
-                <CourseCard key={course.code} course={course} />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(searchTerm.trim() === ''
+              ? filteredCourses.slice(0, 9) // Show only first 9 if no search
+              : filteredCourses // Show all matches if searching
+            ).map(course => (
+              <CourseCard key={course.code} course={course} />
+            ))}
+          </div>
           </div>
         )}
 
@@ -620,16 +630,19 @@ const priorityCourses = getPriorityCourses(
 
          {/* Course Detail Modal - only renders when course is selected */}
     <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+
+<SemesterModal
+  course={courseToAdd}
+  plannedCourses={plannedCourses}
+  completedCourses={completedCourses} // <-- add this line
+  onClose={() => {
+    setShowSemesterModal(false);
+    setCourseToAdd(null);
+  }}
+  onAdd={handleAddCourse}
+/>
+
     
-    {/* Semester Selection Modal - only renders when adding a course */}
-    <SemesterModal 
-      course={courseToAdd} 
-      onClose={() => {
-        setShowSemesterModal(false);
-        setCourseToAdd(null);
-      }}
-      onAdd={handleAddCourse}
-    />
       </div>
     </div>
     </div>
