@@ -1,6 +1,10 @@
+"use client";
+
 import React, { useState } from 'react';
 import { CheckCircle, Circle, Calendar, TrendingUp, BookOpen, Award, AlertCircle, Target, Clock, Users } from 'lucide-react';
+import Navigation from '../roadmap/NavBar';
 
+// ...rest of your code...
 const ProgressPage = () => {
   const [selectedSemester, setSelectedSemester] = useState('current');
   

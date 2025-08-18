@@ -1,30 +1,20 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 
-const RoadmapNavigation = () => {
+const navItems = [
+  { id: 'roadmap', label: 'Roadmap', href: '/roadmap' },
+  { id: 'progress', label: 'Progress', href: '/progress' },
+  // Add more items as needed
+];
+
+const Navigation = () => {
   const [activeLink, setActiveLink] = useState('roadmap');
 
-  const navItems = [
-    { id: 'roadmap', label: 'Roadmap', href: '#roadmap' },
-    { id: 'courses', label: 'Courses', href: '#courses' },
-    { id: 'progress', label: 'Progress', href: '#progress' },
-    { id: 'profile', label: 'Profile', href: '#profile' }
-  ];
-
-  const handleNavClick = (itemId, href) => {
+  const handleNavClick = (itemId) => {
     setActiveLink(itemId);
-    
-    // Smooth scroll to section
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
   };
 
   const handleHomeClick = () => {
-    // Navigate to home page - you can replace this with your routing logic
     window.location.href = '/';
   };
 
@@ -51,17 +41,18 @@ const RoadmapNavigation = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id, item.href)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    activeLink === item.id
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30'
-                      : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </button>
+                <Link key={item.id} href={item.href}>
+                  <span
+                    onClick={() => handleNavClick(item.id)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 cursor-pointer ${
+                      activeLink === item.id
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-400/30'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
               ))}
             </div>
           </div>
@@ -80,4 +71,4 @@ const RoadmapNavigation = () => {
   );
 };
 
-export default RoadmapNavigation;
+export default Navigation;
